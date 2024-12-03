@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gene Randomizer</title>
+  <style>
+    /* General Styling */
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: #8ed9f9;
+      color: black;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #43bdf2;
+      padding: 10px 20px;
+      box-sizing: border-box;
+      color: white;
+    }
+    .title {
+      flex-grow: 1;
+      font-size: 1.5em;
+    }
+    nav {
+      display: flex;
+      gap: 10px;
+    }
+    nav button {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: white;
+      border: none;
+      border-radius: 5px;
+      color: black;
+    }
+    nav button:hover {
+      background-color: #459bc0;
+      color: white;
+    }
+    section {
+      flex-grow: 1;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .active {
+      display: flex;
+    }
+
+    /* Randomizer Page */
+    .randomizer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .generate-btn {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background: #43bdf2;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .generate-btn:hover {
+      background: #459bc0;
+      transform: scale(1.05);
+    }
+    .generate-btn:active {
+      background: #8ed9f9;
+      transform: scale(0.95);
+    }
+    .random-output {
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    /* Output List */
+    .output-container {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: white;
+      border: 2px solid #459bc0;
+      padding: 0;
+      border-radius: 5px;
+      display: none;
+      flex-direction: column;
+      max-height: calc(100vh - 150px); /* Dynamic max-height */
+      width: 300px; /* Wider tab */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #459bc0;
+      color: white;
+      padding: 10px;
+      border-radius: 5px 5px 0 0;
+    }
+    .output-list {
+      padding: 10px;
+      list-style: none;
+      margin: 0;
+      display: flex;
+      flex-direction: column-reverse; /* Newest items appear at the top */
+      overflow-y: auto; /* Make list scrollable */
+      scrollbar-width: none; /* Hide scrollbar (Firefox) */
+      -ms-overflow-style: none; /* Hide scrollbar (IE/Edge) */
+    }
+    .output-list::-webkit-scrollbar {
+      display: none; /* Hide scrollbar (WebKit) */
+    }
+    .output-list li {
+      margin: 5px 0;
+      font-size: 1.1em;
+    }
+    .output-list li span {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    .show-output-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #459bc0;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .show-output-btn:hover {
+      background: #43bdf2;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: white;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="title">Bingellian Genetics: Randomizer</span>
+    <nav>
+      <button onclick="showSection('home')">Home</button>
+      <button onclick="showSection('randomizer')">Randomizer</button>
+      <button onclick="showSection('rules')">Rules</button>
+    </nav>
+  </header>
+  <section id="home" class="active">
+    <div>
+      <h1>Welcome to Bingellian Genetics: Randomizer!</h1>
+      <p>Generate random pairs of genes for Bingellian Genetics. Explore the rules and enjoy playing!</p>
+    </div>
+  </section>
+  <section id="randomizer">
+    <div class="randomizer-container">
+      <h2>Generate a Random Pair</h2>
+      <button class="generate-btn" onclick="generateRandomPair()">Generate</button>
+      <div class="random-output" id="output"></div>
+    </div>
+    <div class="output-container" id="outputContainer">
+      <div class="output-header">
+        <span>Saved Pairs</span>
+        <button class="close-btn" onclick="hideOutput()">×</button>
+      </div>
+      <ul class="output-list" id="savedPairs"></ul>
+    </div>
+    <button class="show-output-btn" id="showOutputBtn" onclick="showOutput()">Show Saved Pairs</button>
+  </section>
+  <section id="rules">
+    <div>
+      <h1>Rules</h1>
+      <p style="text-align: left; margin: 0 auto; max-width: 600px;">
+        - You will need six players.<br>
+        - Each player will be given a “bingo card” with a random di-hybrid crossing between genotypes. <br>
+        - Each player will be given 16 random combinations of genotypes. <br>
+        - A randomizer will select a combination to be announced to all players.<br>
+        - If the combination is in the possession of a player, then they will place the genotype combination in the corresponding box/space of their card.<br>
+        - Once a column, row, or diagonal pattern is filled on a player's card the word “BINGELIAN” must be shouted.<br>
+        - The card of the one who shouted will be checked for verification.<br>
+        - The first person to completely and correctly fill up their “bingellian card” wins.<br>
+      </p>
+    </div>
+  </section>
+  
+  <script>
+    const sections = document.querySelectorAll("section");
+    let count = 0;
+
+    function showSection(id) {
+      sections.forEach(section => section.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    function generateRandomPair() {
+      const array1 = ["AA", "BB", "CC", "DD", "EE", "FF", "GG", "HH"];
+      const array2 = ["Aa", "Bb", "Cc", "Dd", "Ee", "Ff", "Gg", "Hh"];
+      const array3 = ["aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh"];
+      const arrays = [array1, array2, array3];
+      const selectedIndices = [];
+      while (selectedIndices.length < 2) {
+        const randomIndex = Math.floor(Math.random() * arrays.length);
+        if (!selectedIndices.includes(randomIndex)) {
+          selectedIndices.push(randomIndex);
+        }
+      }
+      const [selectedArray1, selectedArray2] = selectedIndices.map(index => arrays[index]);
+      const random1 = selectedArray1[Math.floor(Math.random() * selectedArray1.length)];
+      const random2 = selectedArray2[Math.floor(Math.random() * selectedArray2.length)];
+      const pair = `${random1}${random2}`;
+      document.getElementById("output").textContent = pair;
+
+      // Add pair to the top of the list
+      count++;
+      const savedPairsList = document.getElementById("savedPairs");
+      const listItem = document.createElement("li");
+      listItem.innerHTML = `<span>${count}:</span> ${pair}`;
+      savedPairsList.insertBefore(listItem, savedPairsList.firstChild);
+    }
+
+    function showOutput() {
+      document.getElementById("outputContainer").style.display = "flex";
+      document.getElementById("showOutputBtn").style.display = "none";
+    }
+
+    function hideOutput() {
+      document.getElementById("outputContainer").style.display = "none";
+      document.getElementById("showOutputBtn").style.display = "block";
+    }
+  </script>
+</body>
+</html>
